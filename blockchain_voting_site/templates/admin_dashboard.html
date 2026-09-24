@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Admin{% endblock %}
+{% set active = 'admin' %}
+{% block content %}
+<h1 class="page-title">Administrator dashboard</h1>
+
+{% if not current %}
+  <p class="section-sub">There is no pending or active election. Create one below.</p>
+  <div class="card">
+    <h2 class="section-title" style="margin-top:0;">Create election</h2>
+    <form method="POST" action="{{ url_for('admin_create_election') }}" class="stack">
+      <div class="field">
+        <label for="name">Election name</label>
+        <input type="text" id="name" name="name" placeholder="e.g. College Student Council Election 2026" required>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="start_time">Start time (optional)</label>
+          <input type="datetime-local" id="start_time" name="start_time">
+        </div>
+        <div class="field">
+          <label for="end_time">End time (optional)</label>
+          <input type="datetime-local" id="end_time" name="end_time">
+        </div>
+      </div>
+      <button class="btn" type="submit">Create election</button>
+    </form>
+  </div>
+{% else %}
+  <div class="card">
+    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+      <div>
+        <h2 class="section-title" style="margin:0 0 4px;">{{ current.name }}</h2>
+        <span class="badge {{ current.status }}">{{ current.status }}</span>
+      </div>
+      <div style="display:flex; gap:8px;">
+        {% if current.status == 'pending' %}
+          <form method="POST" action="{{ url_for('admin_start_election') }}">
+            <input type="hidden" name="election_id" value="{{ current.id }}">
+            <button class="btn" type="submit">Start election</button>
+          </form>
+        {% elif current.status == 'active' %}
+          <form method="POST" action="{{ url_for('admin_end_election') }}">
+            <input type="hidden" name="election_id" value="{{ current.id }}">
+            <button class="btn btn-danger" type="submit">End election</button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <h2 class="section-title">Candidates</h2>
+  <div class="card">
+    {% if not candidates %}
+      <div class="empty-note">No candidates added yet.</div>
+    {% else %}
+      {% for c in candidates %}
+        <div class="candidate-row">
+          <div style="flex:1;">
+            <div class="cand-name">{{ c.name }}</div>
+            {% if c.party %}<div class="cand-party">{{ c.party }}</div>{% endif %}
+          </div>
+          {% if current.status == 'pending' %}
+          <form method="POST" action="{{ url_for('admin_remove_candidate', cid=c.id) }}">
+            <button class="btn btn-sm btn-danger" type="submit">Remove</button>
+          </form>
+          {% endif %}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    {% if current.status == 'pending' %}
+    <div class="hr"></div>
+    <form method="POST" action="{{ url_for('admin_add_candidate') }}" class="stack">
+      <input type="hidden" name="election_id" value="{{ current.id }}">
+      <div class="grid-2">
+        <div class="field">
+          <label for="cname">Candidate name</label>
+          <input type="text" id="cname" name="name" required>
+        </div>
+        <div class="field">
+          <label for="cparty">Party / description (optional)</label>
+          <input type="text" id="cparty" name="party">
+        </div>
+      </div>
+      <button class="btn btn-ghost" type="submit">Add candidate</button>
+    </form>
+    <p class="muted" style="margin-top:10px;">Need at least two candidates before the election can be started.</p>
+    {% endif %}
+  </div>
+{% endif %}
+
+<h2 class="section-title">Election history</h2>
+<div class="card">
+  {% if not elections %}
+    <div class="empty-note">No elections yet.</div>
+  {% else %}
+    <table class="simple">
+      <thead><tr><th>Name</th><th>Status</th></tr></thead>
+      <tbody>
+        {% for e in elections %}
+        <tr><td>{{ e.name }}</td><td><span class="badge {{ e.status }}">{{ e.status }}</span></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+</div>
+{% endblock %}

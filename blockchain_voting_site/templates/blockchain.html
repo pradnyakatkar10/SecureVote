@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Blockchain{% endblock %}
+{% set active = 'ledger' %}
+{% block content %}
+<h1 class="page-title">Ethereum blockchain</h1>
+<p class="section-sub">Votes are submitted as transactions to the Solidity smart contract deployed on Ganache. SQLite stores application data; the vote itself is recorded on-chain.</p>
+
+<div class="card">
+  <div class="kv">
+    <div class="kv-row"><span class="kv-label">Connection</span><span class="badge {{ 'active' if ready else 'bad' }}">{{ 'connected' if ready else 'not configured' }}</span></div>
+    <div class="kv-row"><span class="kv-label">RPC</span><span>{{ rpc_url }}</span></div>
+    <div class="kv-row"><span class="kv-label">Contract</span><span>{{ contract_address or 'Set CONTRACT_ADDRESS' }}</span></div>
+    {% if election %}<div class="kv-row"><span class="kv-label">Election</span><span>{{ election.name }}</span></div>{% endif %}
+  </div>
+</div>
+
+{% if ready %}
+<div class="card">
+  <h2 class="section-title" style="margin-top:0;">On-chain results</h2>
+  {% if results %}
+    {% for name, count in results %}
+      <div class="candidate-row"><div style="flex:1"><div class="cand-name">{{ name }}</div></div><div class="cand-count">{{ count }} vote(s)</div></div>
+    {% endfor %}
+  {% else %}<div class="empty-note">No candidates are currently recorded on-chain.</div>{% endif %}
+</div>
+
+<div class="card">
+  <h2 class="section-title" style="margin-top:0;">Vote transactions</h2>
+  {% if txs %}
+    {% for tx in txs %}<div class="kv-row"><span class="kv-label">Transaction</span><span style="word-break:break-all;">{{ tx.blockchain_tx_hash }}</span></div>{% endfor %}
+  {% else %}<div class="empty-note">No vote transactions yet.</div>{% endif %}
+</div>
+{% else %}
+<div class="card"><p><b>Setup required:</b> start Ganache, deploy <code>VotingSystem.sol</code>, then set <code>GANACHE_PRIVATE_KEY</code> and <code>CONTRACT_ADDRESS</code>.</p></div>
+{% endif %}
+{% endblock %}

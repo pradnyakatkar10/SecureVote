@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Cast a Vote{% endblock %}
+{% set active = 'dashboard' %}
+{% block content %}
+<h1 class="page-title">
+  {% if election %}{{ election.name }}{% else %}No active election{% endif %}
+</h1>
+
+{% if not election %}
+  <p class="section-sub">There is no election open for voting right now. Check back once the administrator starts one.</p>
+{% elif has_voted %}
+  <div class="card">
+    <p style="margin:0;">✅ You have already cast your vote in <b>{{ election.name }}</b>. Thank you for participating.</p>
+    <p class="muted" style="margin-top:10px;">You can check the <a href="{{ url_for('results') }}">live results</a> or inspect the <a href="{{ url_for('blockchain_view') }}">blockchain ledger</a> at any time.</p>
+  </div>
+{% else %}
+  <p class="section-sub">Select one candidate below, then cast your vote. Once submitted, it is mined into a new block and cannot be changed.</p>
+  <div class="card">
+    <form method="POST" action="{{ url_for('vote') }}">
+      <div class="stack">
+        {% for c in candidates %}
+        <label class="candidate-row" style="cursor:pointer;">
+          <input class="cand-radio" type="radio" name="candidate_id" value="{{ c.id }}" required>
+          <div style="flex:1;">
+            <div class="cand-name">{{ c.name }}</div>
+            {% if c.party %}<div class="cand-party">{{ c.party }}</div>{% endif %}
+          </div>
+        </label>
+        {% endfor %}
+      </div>
+      <button class="btn" type="submit" style="margin-top:18px;">Seal my vote</button>
+    </form>
+  </div>
+{% endif %}
+{% endblock %}

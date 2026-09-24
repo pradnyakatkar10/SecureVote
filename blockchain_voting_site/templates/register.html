@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+{% block content %}
+<h1 class="page-title">Register to vote</h1>
+<p class="section-sub">Your password is hashed before storage, and your Student ID is hashed into a one-way "voter hash" before it ever touches the blockchain — the ledger never sees your ID as typed.</p>
+
+<div class="card">
+  <form method="POST" action="{{ url_for('register') }}" class="stack">
+    <div class="field">
+      <label for="name">Full name</label>
+      <input type="text" id="name" name="name" value="{{ form.get('name','') }}" required>
+    </div>
+    <div class="field">
+      <label for="student_id">Student ID</label>
+      <input type="text" id="student_id" name="student_id" value="{{ form.get('student_id','') }}" required>
+    </div>
+    <div class="field">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" value="{{ form.get('email','') }}" required>
+    </div>
+    <div class="field">
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required>
+    </div>
+    <button class="btn" type="submit">Register</button>
+  </form>
+</div>
+
+<p class="muted">Already registered? <a href="{{ url_for('login') }}">Log in here</a>.</p>
+{% endblock %}

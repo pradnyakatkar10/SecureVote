@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Results{% endblock %}
+{% set active = 'results' %}
+{% block content %}
+<h1 class="page-title">Election results</h1>
+
+{% if not election %}
+  <p class="section-sub">No election has been created yet.</p>
+{% else %}
+  <p class="section-sub">{{ election.name }} — <span class="badge {{ election.status }}">{{ election.status }}</span> — tallied live from the blockchain, not a separate counter.</p>
+
+  <div class="card">
+    {% if not candidates %}
+      <div class="empty-note">No candidates in this election.</div>
+    {% else %}
+      {% for c in candidates|sort(attribute='id', reverse=false) %}
+        {% set n = counts.get(c.id, 0) %}
+        {% set pct = ((n / total_votes) * 100) | round(1) if total_votes else 0 %}
+        <div class="candidate-row">
+          <div style="flex:0 0 auto; min-width:160px;">
+            <div class="cand-name">{{ c.name }}</div>
+            {% if c.party %}<div class="cand-party">{{ c.party }}</div>{% endif %}
+          </div>
+          <div class="cand-bar-wrap"><div class="cand-bar" style="width:{{ pct }}%"></div></div>
+          <div class="cand-count">{{ n }} ({{ pct }}%)</div>
+        </div>
+      {% endfor %}
+      <div class="hr"></div>
+      <div class="grid-2">
+        <div><span class="muted">Total registered voters</span><br><b>{{ total_voters }}</b></div>
+        <div><span class="muted">Total votes cast</span><br><b>{{ total_votes }}</b></div>
+      </div>
+      {% if total_voters %}
+        <p class="muted" style="margin-top:10px;">Turnout: {{ ((total_votes / total_voters) * 100) | round(1) }}%</p>
+      {% endif %}
+    {% endif %}
+  </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}SecureVote{% endblock %} — Blockchain Voting System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,500;0,600;0,700;1,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="{{ 'wrap-narrow' if narrow else 'wrap' }}">
+  <header class="top">
+    <div class="top-row">
+      <div class="seal">SV</div>
+      <div class="top-text">
+        <h1>SecureVote</h1>
+        {% if session.get('name') %}<div class="who">Signed in as {{ session['name'] }}{% if session.get('is_admin') %} (Administrator){% endif %}</div>{% endif %}
+      </div>
+      <nav class="tabs">
+        {% if session.get('is_admin') %}
+          <a href="{{ url_for('admin_dashboard') }}" class="{{ 'active' if active=='admin' }}">Admin</a>
+          <a href="{{ url_for('admin_voters') }}" class="{{ 'active' if active=='voters' }}">Voters</a>
+          <a href="{{ url_for('results') }}" class="{{ 'active' if active=='results' }}">Results</a>
+          <a href="{{ url_for('blockchain_view') }}" class="{{ 'active' if active=='ledger' }}">Ledger</a>
+          <a href="{{ url_for('logout') }}" class="logout">Logout</a>
+        {% elif session.get('user_id') %}
+          <a href="{{ url_for('dashboard') }}" class="{{ 'active' if active=='dashboard' }}">Vote</a>
+          <a href="{{ url_for('results') }}" class="{{ 'active' if active=='results' }}">Results</a>
+          <a href="{{ url_for('blockchain_view') }}" class="{{ 'active' if active=='ledger' }}">Ledger</a>
+          <a href="{{ url_for('logout') }}" class="logout">Logout</a>
+        {% else %}
+          <a href="{{ url_for('login') }}" class="{{ 'active' if active=='login' }}">Voter Login</a>
+          <a href="{{ url_for('register') }}" class="{{ 'active' if active=='register' }}">Register</a>
+          <a href="{{ url_for('admin_login') }}" class="{{ 'active' if active=='admin_login' }}">Admin</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+
+  <footer>
+    Blockchain-Based Voting System — mini-project. Access is enforced server-side: every page above requires a valid session.
+  </footer>
+</div>
+</body>
+</html>

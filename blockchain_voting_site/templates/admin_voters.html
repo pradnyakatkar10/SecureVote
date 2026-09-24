@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Voters{% endblock %}
+{% set active = 'voters' %}
+{% block content %}
+<h1 class="page-title">Registered voters</h1>
+<p class="section-sub">The application database — it knows who is registered, but never who anyone voted for. That link exists only on the blockchain, keyed by each voter's one-way hash.</p>
+
+<div class="card">
+  {% if not voters %}
+    <div class="empty-note">No voters registered yet.</div>
+  {% else %}
+    <table class="simple">
+      <thead><tr><th>Name</th><th>Student ID</th><th>Email</th><th>Voter hash</th></tr></thead>
+      <tbody>
+        {% for v in voters %}
+        <tr>
+          <td>{{ v.name }}</td>
+          <td class="mono">{{ v.student_id }}</td>
+          <td>{{ v.email }}</td>
+          <td class="mono">{{ v.voter_hash[:16] }}…</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+</div>
+{% endblock %}
